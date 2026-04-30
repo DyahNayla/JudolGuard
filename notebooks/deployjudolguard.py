@@ -15,9 +15,12 @@ AZURE_KEY      = "C0SG9EyACffSlTnabV0ClNFyn2FGD1rb0yoHkEMHtmQuO91l7Wm8JQQJ99CDAC
 AZURE_ENDPOINT = "https://projekjudol.openai.azure.com/"
 AZURE_DEPLOY   = "gpt-4o"
 
-os.environ["AZURE_KEY"]      = AZURE_KEY
-os.environ["AZURE_ENDPOINT"] = AZURE_ENDPOINT
-os.environ["AZURE_DEPLOY"]   = AZURE_DEPLOY
+import streamlit as st
+
+# Pakai st.secrets, jangan pakai os.environ atau file manual
+AZURE_KEY = st.secrets["AZURE_KEY"]
+AZURE_ENDPOINT = st.secrets["AZURE_ENDPOINT"]
+AZURE_DEPLOY = st.secrets["AZURE_DEPLOY"]
 
 if AZURE_KEY and AZURE_ENDPOINT:
     print(f"✓ Azure credentials siap")
@@ -28,15 +31,9 @@ else:
 
 import os
 
-# Create .streamlit directory if it doesn't exist
-os.makedirs('.streamlit', exist_ok=True)
-
-# Write secrets to .streamlit/secrets.toml
-secrets_path = '.streamlit/secrets.toml'
-with open(secrets_path, 'w') as f:
-    f.write(f'AZURE_KEY = "{os.environ["AZURE_KEY"]}"\n')
-    f.write(f'AZURE_ENDPOINT = "{os.environ["AZURE_ENDPOINT"]}"\n')
-    f.write(f'AZURE_DEPLOY = "{os.environ["AZURE_DEPLOY"]}"\n')
+AZURE_KEY = "C0SG9EyACffSlTnabV0ClNFyn2FGD1rb0yoHkEMHtmQuO91l7Wm8JQQJ99CDACNns7RXJ3w3AAABACOGl0AL"
+AZURE_ENDPOINT = "https://projekjudol.openai.azure.com/"
+AZURE_DEPLOY = "gpt-4o"
 
 print(f"✓ {secrets_path} created with Azure credentials.")
 
