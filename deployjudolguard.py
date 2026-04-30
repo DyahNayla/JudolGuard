@@ -111,7 +111,7 @@ with st.sidebar:
 filtered = risk_df[risk_df["risk_level"].isin(sel_levels) & risk_df["profile"].isin(sel_profiles)].copy()
 
 # ════════════════════════════════════════════════════════════
-# 4. HALAMAN 1 — OVERVIEW (BACK TO ORIGINAL DESIGN)
+# HALAMAN 1 — OVERVIEW (BACK TO ORIGINAL DESIGN)
 # ════════════════════════════════════════════════════════════
 if page == "📊 Overview":
     st.markdown("# 📊 Overview Dashboard")
