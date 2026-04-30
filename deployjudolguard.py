@@ -84,7 +84,7 @@ def load_data():
     try:
         # Gunakan relative path. Pastikan folder 'data' ada di root GitHub.
         risk = pd.read_csv("data/risk_scores_with_explanation.csv")
-        features = pd.read_csv("data/judolguard_features.csv")
+        features = pd.read_csv("data/judolguard_.csv")
         return risk, features
     except FileNotFoundError:
         st.error("Dataset tidak ditemukan di folder 'data/'. Periksa struktur folder GitHub Anda.")
