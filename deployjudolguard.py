@@ -7,9 +7,7 @@ from plotly.subplots import make_subplots
 import os
 from openai import AzureOpenAI
 
-# ════════════════════════════════════════════════════════════
 # 1. KONFIGURASI HALAMAN & META TAG
-# ════════════════════════════════════════════════════════════
 st.set_page_config(
     page_title="JudolGuard",
     page_icon="🛡️",
@@ -24,9 +22,7 @@ st.markdown("""
     </head>
 """, unsafe_allow_html=True)
 
-# ════════════════════════════════════════════════════════════
 # 2. STYLE KUSTOM (CSS)
-# ════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
@@ -57,9 +53,8 @@ html, body, [class*="css"] { font-family: "DM Sans", sans-serif; }
 </style>
 """, unsafe_allow_html=True)
 
-# ════════════════════════════════════════════════════════════
 # 3. KREDENSIAL & INITIALIZATION
-# ════════════════════════════════════════════════════════════
+
 # Mengambil secrets dari dashboard hosting (Azure/Streamlit)
 try:
     AZURE_KEY = st.secrets["AZURE_KEY"]
@@ -76,9 +71,7 @@ LEVEL_COLORS = {"Low": "#6ee7b7", "Medium": "#fcd34d", "High": "#fb923c", "Criti
 PROFILE_COLORS = {"normal": "#60a5fa", "early_stage": "#fcd34d", "escalating": "#fb923c", "heavy_gambler": "#f87171"}
 PROFILE_FILL = {"normal": "rgba(96,165,250,0.15)", "early_stage": "rgba(252,211,77,0.15)", "escalating": "rgba(251,146,60,0.15)", "heavy_gambler": "rgba(248,113,113,0.15)"}
 
-# ════════════════════════════════════════════════════════════
 # 4. LOAD DATA
-# ════════════════════════════════════════════════════════════
 @st.cache_data
 def load_data():
     try:
@@ -92,9 +85,7 @@ def load_data():
 
 risk_df, features_df = load_data()
 
-# ════════════════════════════════════════════════════════════
 # 5. SIDEBAR & NAVIGATION
-# ════════════════════════════════════════════════════════════
 with st.sidebar:
     st.markdown("## 🛡️ JudolGuard")
     st.markdown("<p style='font-size:13px;color:#6b7280;margin-top:-8px;'>Early Behavioral Shift Detection</p>", unsafe_allow_html=True)
@@ -110,9 +101,7 @@ with st.sidebar:
 
 filtered = risk_df[risk_df["risk_level"].isin(sel_levels) & risk_df["profile"].isin(sel_profiles)].copy()
 
-# ════════════════════════════════════════════════════════════
 # HALAMAN 1 — OVERVIEW (BACK TO ORIGINAL DESIGN)
-# ════════════════════════════════════════════════════════════
 if page == "📊 Overview":
     st.markdown("# 📊 Overview Dashboard")
     st.markdown("<p style='color:#6b7280;margin-top:-12px;font-size:14px;'>Sistem deteksi dini perubahan perilaku transaksi — tim compliance e-wallet</p>", unsafe_allow_html=True)
@@ -219,9 +208,7 @@ if page == "📊 Overview":
                 <div style="font-size:12px;color:#6b7280;line-height:1.8">{items_html}</div>
             </div>""", unsafe_allow_html=True)
 
-# ════════════════════════════════════════════════════════════
 # HALAMAN 2 — RISK TABLE (PAGINATION)
-# ════════════════════════════════════════════════════════════
 elif page == "📋 Risk Table":
     st.markdown("# 📋 Risk Table")
     search = st.text_input("🔍 Cari Account ID", placeholder="Ketik account ID...")
@@ -264,9 +251,7 @@ elif page == "📋 Risk Table":
         st.session_state["risk_page"] += 1
         st.rerun()
 
-# ════════════════════════════════════════════════════════════
 # HALAMAN 3 — DETAIL AKUN (ANALISIS AI)
-# ════════════════════════════════════════════════════════════
 elif page == "🔍 Detail Akun":
     st.markdown("# 🔍 Detail Akun")
     sel_acc = st.selectbox("Pilih Akun", filtered["account_id"].unique())
