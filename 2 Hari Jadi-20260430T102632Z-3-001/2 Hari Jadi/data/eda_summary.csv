@@ -1,5 +1,0 @@
-profile,n_akun,n_transaksi,avg_night_ratio,avg_tx_per_day,avg_unique_recv,avg_qris_ratio,avg_temporal_shift,pct_at_risk
-early_stage,155,5301,0.32,2.533,3.028,0.245,0.095,0.0%
-escalating,155,8215,0.319,10.009,3.474,0.198,0.242,100.0%
-heavy_gambler,155,6913,0.319,11.056,2.175,0.851,0.3,100.0%
-normal,155,4309,0.284,0.597,2.755,0.0,0.067,0.0%

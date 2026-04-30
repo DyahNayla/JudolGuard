@@ -1,4 +1,0 @@
-PR-AUC   : 0.9655
-F1-Score XGB : 0.8598
-ROC-AUC  : 0.7381
-F1-Score Isolation : 0.5954
