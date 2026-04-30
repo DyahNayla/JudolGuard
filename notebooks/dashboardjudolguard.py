@@ -115,9 +115,8 @@ REC_DETAIL = {
     "Critical": ("🔴 Eskalasi Segera",  "Freeze transaksi + laporkan ke tim compliance & OJK.",   "#450a0a","#f87171"),
 }
 
-# ════════════════════════════════════════════════════════════
-# SECRETS — aman tanpa secrets.toml (priority: secrets → env → default)
-# ════════════════════════════════════════════════════════════
+# SECRETS 
+
 def _get_secret(key, default=""):
     try:
         return st.secrets[key]
@@ -128,9 +127,9 @@ AZURE_KEY      = _get_secret("AZURE_KEY")
 AZURE_ENDPOINT = _get_secret("AZURE_ENDPOINT")
 AZURE_DEPLOY   = _get_secret("AZURE_DEPLOY", "gpt-4o")
 
-# ════════════════════════════════════════════════════════════
+
 # AZURE OPENAI
-# ════════════════════════════════════════════════════════════
+
 def get_azure_recommendation(acc_row):
     if not AZURE_KEY or not AZURE_ENDPOINT:
         return None
@@ -168,9 +167,9 @@ Gunakan bahasa Indonesia yang profesional dan ringkas."""
     except Exception as e:
         return f"Error koneksi Azure OpenAI: {e}"
 
-# ════════════════════════════════════════════════════════════
+
 # LOAD DATA
-# ════════════════════════════════════════════════════════════
+
 @st.cache_data
 def load_data():
     risk = None # Initialize risk
@@ -205,9 +204,9 @@ if risk_df.empty or "risk_level" not in risk_df.columns or "profile" not in risk
     filtered = pd.DataFrame()
     # No need to st.stop() here as we've provided an empty DataFrame to proceed gracefully.
 else:
-    # ════════════════════════════════════════════════════════════
+
     # SIDEBAR
-    # ════════════════════════════════════════════════════════════
+    
     with st.sidebar:
         st.markdown("## 🛡️ JudolGuard")
         st.markdown("<p style='font-size:13px;color:#6b7280;margin-top:-8px;'>Early Behavioral Shift Detection<br>untuk E-Wallet Indonesia</p>", unsafe_allow_html=True)
@@ -249,9 +248,9 @@ else:
         risk_df["profile"].isin(sel_profiles)
     ].copy()
 
-    # ════════════════════════════════════════════════════════════
+  
     # HALAMAN 1 — OVERVIEW
-    # ════════════════════════════════════════════════════════════
+   
     if page == "📊 Overview":
         st.markdown("# 📊 Overview Dashboard")
         st.markdown("<p style='color:#6b7280;margin-top:-12px;font-size:14px;'>Sistem deteksi dini perubahan perilaku transaksi — tim compliance e-wallet</p>", unsafe_allow_html=True)
@@ -342,10 +341,10 @@ else:
                 fig4.update_traces(textposition="outside", textfont_color="white")
                 st.plotly_chart(fig4, use_container_width=True)
 
-        # ════════════════════════════════════════════════════════
+     
         # [BARU] TOP 10 AKUN — PERUBAHAN POLA TERBARU
         # Kriteria: temporal_shift tertinggi (positif = bergeser ke malam)
-        # ════════════════════════════════════════════════════════
+    
         st.divider()
         st.markdown("<div class='section-title'>🚨 Top 10 Akun — Perubahan Pola Transaksi Terbaru</div>", unsafe_allow_html=True)
         st.markdown("<p style='font-size:12px;color:#6b7280;margin-top:-8px;margin-bottom:12px;'>Diurutkan berdasarkan Temporal Shift Score tertinggi — akun yang paling cepat berubah ke pola berisiko</p>", unsafe_allow_html=True)
@@ -426,9 +425,9 @@ else:
                 </div>""", unsafe_allow_html=True)
 
 
-    # ════════════════════════════════════════════════════════════
+    
     # HALAMAN 2 — RISK TABLE  [PAGINATION: 20/page + nomor halaman]
-    # ════════════════════════════════════════════════════════════
+
     elif page == "📋 Risk Table":
         st.markdown("# 📋 Risk Table")
         st.markdown("<p style='color:#6b7280;margin-top:-12px;font-size:14px;'>Diurutkan berdasarkan risk score tertinggi</p>", unsafe_allow_html=True)
@@ -457,14 +456,14 @@ else:
         end_idx      = min(start_idx + PAGE_SIZE, total_rows)
         shown        = table.iloc[start_idx:end_idx]
 
-        # ── Header tabel ─────────────────────────────────────────
+        #  Header tabel 
         h1, h2, h3, h4 = st.columns([2.5, 1.5, 1.5, 2.5])
         for col, label in zip([h1,h2,h3,h4], ["Account ID","Score","Level","Top Trigger"]):
             with col:
                 st.markdown(f"<div style='font-size:11px;color:#6b7280;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:4px 0;'>{label}</div>", unsafe_allow_html=True)
         st.markdown("<hr style='margin:0 0 4px;border:none;border-top:1px solid #2d3142;'>", unsafe_allow_html=True)
 
-        # ── Baris data ───────────────────────────────────────────
+        #  Baris data 
         for _, row in shown.iterrows():
             level = row["risk_level"]
             score = row["final_risk_score"]
@@ -486,7 +485,7 @@ else:
                 st.markdown(f"<div style='font-size:12px;color:#9ca3af;padding:7px 0;'>{row.get('top_triggers','-')}</div>", unsafe_allow_html=True)
             st.markdown("<hr style='margin:0;border:none;border-top:0.5px solid #2d3142;'>", unsafe_allow_html=True)
 
-        # ── Pagination controls ──────────────────────────────────
+        #  Pagination controls 
         st.markdown("<br>", unsafe_allow_html=True)
 
         # Info baris
@@ -542,9 +541,9 @@ else:
                 st.rerun()
 
 
-    # ════════════════════════════════════════════════════════════
+   
     # HALAMAN 3 — DETAIL AKUN  [GRAFIK GARIS untuk perubahan pola]
-    # ════════════════════════════════════════════════════════════
+ 
     elif page == "🔍 Detail Akun":
         st.markdown("# 🔍 Detail Akun")
 
@@ -579,11 +578,11 @@ else:
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # ════════════════════════════════════════════════════════
+     
         # [BARU] GRAFIK GARIS — POLA PERUBAHAN PERILAKU
         # Semua 4 metrik utama ditampilkan sebagai line chart
         # dengan area fill untuk menunjukkan tren perubahan
-        # ════════════════════════════════════════════════════════
+     
         if features_df is not None:
             acc_f = features_df[features_df["account_id"] == sel].sort_values("day")
 
@@ -605,7 +604,7 @@ else:
 
                 days = acc_f["day"].values
 
-                # ── Chart 1: Frekuensi Transaksi ───────────────
+                #  Chart 1: Frekuensi Transaksi 
                 y1 = acc_f["tx_count_24h"].values
                 fig_line.add_trace(
                     go.Scatter(
@@ -623,7 +622,7 @@ else:
                                    annotation_text=f"avg {avg1:.1f}",
                                    annotation_font_color="#6b7280", annotation_font_size=10)
 
-                # ── Chart 2: Night Ratio ────────────────────────
+                # Chart 2: Night Ratio 
                 y2 = acc_f["night_ratio_7d"].values
                 fig_line.add_trace(
                     go.Scatter(
@@ -640,7 +639,7 @@ else:
                                    annotation_text="⚠ 30% threshold",
                                    annotation_font_color="#fcd34d", annotation_font_size=10)
 
-                # ── Chart 3: Temporal Shift (LINE, bukan bar) ──
+                # Chart 3: Temporal Shift 
                 y3 = acc_f["temporal_shift"].values
                 # Pisah warna positif vs negatif dengan dua trace
                 y3_pos = np.where(y3 >= 0, y3, np.nan)
@@ -662,7 +661,7 @@ else:
                 fig_line.add_hline(y=0, line_color="#6b7280", line_dash="solid",
                                    line_width=1, row=3, col=1)
 
-                # ── Chart 4: Burst Score ────────────────────────
+                #  Chart 4: Burst Score 
                 y4 = acc_f["burst_score"].values if "burst_score" in acc_f.columns else np.zeros(len(days))
                 fig_line.add_trace(
                     go.Scatter(
@@ -679,7 +678,7 @@ else:
                                    annotation_text="⚠ burst threshold",
                                    annotation_font_color="#fcd34d", annotation_font_size=10)
 
-                # ── Layout global ──────────────────────────────
+                # Layout global 
                 fig_line.update_layout(
                     paper_bgcolor="rgba(0,0,0,0)",
                     plot_bgcolor="rgba(0,0,0,0)",
@@ -727,7 +726,7 @@ else:
         else:
             st.info("File features tidak ditemukan. Upload judolguard_features.csv untuk melihat grafik pola.")
 
-        # ── AI Report ───────────────────────────────────────────
+        #  AI Report 
         st.markdown("<div class='section-title'>🤖 AI Risk Analysis (Azure OpenAI GPT-4o)</div>", unsafe_allow_html=True)
         col_btn, _ = st.columns([1, 3])
         with col_btn:
@@ -751,7 +750,7 @@ else:
             else:
                 st.markdown("<div style='background:#1a1d27;border:1px dashed #2d3142;border-radius:8px;padding:1.5rem;text-align:center;color:#6b7280;font-size:13px;'>Klik tombol di atas untuk generate analisis dari Azure OpenAI GPT-4o</div>", unsafe_allow_html=True)
 
-        # ── Behavioral Features ─────────────────────────────────
+        #  Behavioral Features 
         st.markdown("<div class='section-title'>📈 Behavioral Features (Snapshot)</div>", unsafe_allow_html=True)
         feat_map = {
             "avg_night_ratio"   : ("Night Ratio 7d",   "%", 100),
@@ -767,7 +766,7 @@ else:
                 with cols[i % 3]:
                     st.metric(label, f"{acc[k]*mult:.1f}{unit}")
 
-        # ── Rekomendasi Tindakan ────────────────────────────────
+        #  Rekomendasi Tindakan 
         st.divider()
         st.markdown("<div class='section-title'>⚡ Rekomendasi Tindakan</div>", unsafe_allow_html=True)
         title, desc, bg, fg = REC_DETAIL.get(level, REC_DETAIL["Low"])
