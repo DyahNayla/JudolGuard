@@ -43,7 +43,7 @@ client = AzureOpenAI(
 def load_data():
     # Pastikan file ini ada di folder 'data' di GitHub kamu
     risk_df = pd.read_csv('data/risk_scores_with_explanation.csv')
-    features_df = pd.read_csv('data/judolguard_features.csv')
+    features_df = pd.read_csv('data/judolguard_.csv')
     return risk_df, features_df
 
 try:
