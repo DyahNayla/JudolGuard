@@ -54,7 +54,6 @@ html, body, [class*="css"] { font-family: "DM Sans", sans-serif; }
 """, unsafe_allow_html=True)
 
 # 3. KREDENSIAL & INITIALIZATION
-
 # Mengambil secrets dari dashboard hosting (Azure/Streamlit)
 try:
     AZURE_KEY = st.secrets["AZURE_KEY"]
