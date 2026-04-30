@@ -7,9 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1zU1Wnlj5n-uvZqmQMCiZQKEELkeEQpgC
 """
 
-!pip install streamlit plotly -q
-print("✓ Semua dependencies terinstall")
-
 import os
 
 AZURE_KEY      = "C0SG9EyACffSlTnabV0ClNFyn2FGD1rb0yoHkEMHtmQuO91l7Wm8JQQJ99CDACNns7RXJ3w3AAABACOGl0AL"          # ← Paste API Key Azure kamu
