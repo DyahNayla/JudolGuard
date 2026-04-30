@@ -68,13 +68,6 @@ print("\nIsi folder data/:")
 os.makedirs('data', exist_ok=True)
 print(os.listdir('data'))
 
-# Jalankan ini di session yang sama dengan deploy
-from google.colab import files
-
-# Upload judolguard_features.csv dulu
-uploaded = files.upload()
-# Pilih file judolguard_features.csv dari laptop kamu
-
 import os
 os.makedirs('data', exist_ok=True)
 os.makedirs('models', exist_ok=True)
@@ -180,81 +173,6 @@ joblib.dump(xgb_model, 'models/xgb_judolguard.pkl')
 
 print(f"✓ risk_scores.csv tersimpan: {len(risk)} akun")
 print(f"✓ Distribusi:\n{risk['risk_level'].value_counts().to_string()}")
-
-from pyngrok import conf, ngrok
-import subprocess, threading, time, os, socket
-
-# ← Ganti dengan authtoken dari dashboard.ngrok.com/get-started/your-authtoken
-conf.get_default().auth_token = "3D4RffEbfxuNhdyDlTAYgoAUQzd_wtYvdDSBVDtHNPqJvpHB"
-
-# Kill streamlit dan ngrok yang mungkin masih jalan
-os.system("pkill -f streamlit 2>/dev/null")
-os.system("pkill -f ngrok 2>/dev/null") # Add this line to kill ngrok processes
-time.sleep(2)
-
-# Define paths for Streamlit logs
-streamlit_stdout_log = "streamlit_stdout.log"
-streamlit_stderr_log = "streamlit_stderr.log"
-
-# Function to print Streamlit logs for debugging
-def print_streamlit_logs():
-    print("\nStreamlit did not become ready. Checking logs:")
-    if os.path.exists(streamlit_stdout_log):
-        with open(streamlit_stdout_log, "r") as f:
-            print("\n--- Streamlit STDOUT ---")
-            print(f.read())
-    if os.path.exists(streamlit_stderr_log):
-        with open(streamlit_stderr_log, "r") as f:
-            print("\n--- Streamlit STDERR ---")
-            print(f.read())
-    print("\nConsider debugging 06_dashboard.py or increasing the timeout.")
-
-# Jalankan streamlit di background dan redirect output ke file log
-def run_streamlit_with_logs():
-    with open(streamlit_stdout_log, "w") as fout, open(streamlit_stderr_log, "w") as ferr:
-        subprocess.Popen([
-            'streamlit', 'run', '06_dashboard.py',
-            '--server.port', '8501',
-            '--server.headless', 'true',
-            '--server.enableCORS', 'false',
-            '--server.enableXsrfProtection', 'false'
-        ], env={**os.environ}, stdout=fout, stderr=ferr)
-
-time.sleep(1) # Give a moment for pkill to settle
-threading.Thread(target=run_streamlit_with_logs, daemon=True).start()
-
-# Tunggu streamlit siap dengan polling cerdas
-print("Menunggu Streamlit siap", end="")
-for _ in range(60): # Increased timeout for robustness
-    time.sleep(1)
-    print(".", end="", flush=True)
-    try:
-        # Explicitly use 127.0.0.1 for connection check
-        s = socket.create_connection(("127.0.0.1", 8501), timeout=1)
-        s.close()
-        print(" ✓")
-        break
-    except:
-        pass
-else:
-    print("\n☢☢  Timeout — tetap coba buat tunnel...")
-    print_streamlit_logs()
-
-# Buat tunnel
-try:
-    # ngrok.disconnect_all() # This function seems to be causing an error
-    # Explicitly connect to 127.0.0.1:8501
-    url = ngrok.connect("127.0.0.1:8501")
-    url_str = url.public_url if hasattr(url, "public_url") else str(url)
-    print(f"\n\n{'='*50}")
-    print(f"  ✓ DASHBOARD LIVE!")
-    print(f"  🌐 {url_str}")
-    print(f"{'='*50}")
-    print(f"\n  Jangan tutup cell ini selama demo.")
-except Exception as e:
-    print(f"\n✘ Error ngrok: {e}")
-    print("  Coba restart runtime Colab, lalu jalankan ulang dari Cell 1")
-    print_streamlit_logs()
 
 import os
 from openai import AzureOpenAI
