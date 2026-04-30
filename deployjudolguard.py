@@ -111,25 +111,28 @@ with st.sidebar:
 filtered = risk_df[risk_df["risk_level"].isin(sel_levels) & risk_df["profile"].isin(sel_profiles)].copy()
 
 # ════════════════════════════════════════════════════════════
-# HALAMAN 1 — OVERVIEW
+# 4. HALAMAN 1 — OVERVIEW (BACK TO ORIGINAL DESIGN)
 # ════════════════════════════════════════════════════════════
 if page == "📊 Overview":
     st.markdown("# 📊 Overview Dashboard")
+    st.markdown("<p style='color:#6b7280;margin-top:-12px;font-size:14px;'>Sistem deteksi dini perubahan perilaku transaksi — tim compliance e-wallet</p>", unsafe_allow_html=True)
     st.divider()
 
-    total = len(risk_df)
+    total      = len(risk_df)
     n_critical = (risk_df["risk_level"] == "Critical").sum()
-    n_high = (risk_df["risk_level"] == "High").sum()
-    det_rate = (n_critical + n_high) / total * 100
+    n_high     = (risk_df["risk_level"] == "High").sum()
+    n_medium   = (risk_df["risk_level"] == "Medium").sum()
+    det_rate   = (n_critical + n_high) / total * 100
 
-    c1, c2, c3, c4 = st.columns(4)
-    metrics = [
-        (c1, "Total Akun", total, "#a5b4fc", "dianalisis"),
-        (c2, "🔴 Critical", n_critical, "#f87171", "eskalasi"),
-        (c3, "🟠 High", n_high, "#fb923c", "limit transfer"),
-        (c4, "Detection %", f"{det_rate:.1f}%", "#34d399", "High+Critical")
+    c1, c2, c3, c4, c5 = st.columns(5)
+    metrics_data = [
+        (c1, "Total Akun",   total,             "#a5b4fc", "dianalisis"),
+        (c2, "🔴 Critical",  n_critical,        "#f87171", "eskalasi OJK"),
+        (c3, "🟠 High",      n_high,            "#fb923c", "batasi transfer"),
+        (c4, "🟡 Medium",    n_medium,          "#fcd34d", "notifikasi"),
+        (c5, "Detection %",  f"{det_rate:.1f}%", "#34d399", "High+Critical"),
     ]
-    for col, label, val, color, sub in metrics:
+    for col, label, val, color, sub in metrics_data:
         with col:
             st.markdown(f"""<div class="metric-card">
                 <div class="metric-label">{label}</div>
@@ -139,27 +142,82 @@ if page == "📊 Overview":
 
     st.markdown("<br>", unsafe_allow_html=True)
     cl, cr = st.columns(2)
-    
+
     with cl:
         st.markdown("<div class='section-title'>Distribusi Risk Level</div>", unsafe_allow_html=True)
-        fig = go.Figure(go.Pie(
-            labels=["Critical", "High", "Medium", "Low"],
-            values=[(risk_df["risk_level"] == l).sum() for l in ["Critical", "High", "Medium", "Low"]],
-            marker_colors=[LEVEL_COLORS[l] for l in ["Critical", "High", "Medium", "Low"]],
-            hole=0.55
+        lc    = risk_df["risk_level"].value_counts()
+        order = ["Critical", "High", "Medium", "Low"]
+        fig   = go.Figure(go.Pie(
+            labels=order, values=[lc.get(l, 0) for l in order],
+            marker_colors=[LEVEL_COLORS[l] for l in order],
+            hole=0.55, textinfo="label+percent"
         ))
-        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", showlegend=False, height=300)
+        fig.add_annotation(text=f"<b>{total}</b><br>akun", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", showlegend=False, height=280, margin=dict(t=10,b=10,l=10,r=10))
         st.plotly_chart(fig, use_container_width=True)
 
     with cr:
         st.markdown("<div class='section-title'>Risk Score per Profil</div>", unsafe_allow_html=True)
         fig2 = go.Figure()
-        for p in PROFILE_COLORS.keys():
+        for p in ["normal","early_stage","escalating","heavy_gambler"]:
             d = risk_df[risk_df["profile"] == p]["final_risk_score"]
-            if not d.empty:
-                fig2.add_trace(go.Box(y=d, name=p, marker_color=PROFILE_COLORS[p], fillcolor=PROFILE_FILL[p]))
-        fig2.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=300, font=dict(color="#9ca3af"))
+            if len(d):
+                fig2.add_trace(go.Box(y=d, name=p, marker_color=PROFILE_COLORS[p], line_color=PROFILE_COLORS[p], fillcolor=PROFILE_FILL[p]))
+        fig2.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=280, margin=dict(t=10,b=10,l=10,r=10))
         st.plotly_chart(fig2, use_container_width=True)
+
+    ca, cb = st.columns(2)
+    with ca:
+        st.markdown("<div class='section-title'>Temporal Shift Score per Profil</div>", unsafe_allow_html=True)
+        if "avg_temporal_shift" in risk_df.columns:
+            sm = risk_df.groupby("profile")["avg_temporal_shift"].mean().reset_index()
+            sm["color"] = sm["avg_temporal_shift"].apply(lambda x: "#f87171" if x > 0.01 else "#6ee7b7")
+            fig3 = px.bar(sm, x="profile", y="avg_temporal_shift", color="color", color_discrete_map="identity", text=sm["avg_temporal_shift"].round(3))
+            fig3.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=260, showlegend=False)
+            st.plotly_chart(fig3, use_container_width=True)
+
+    with cb:
+        st.markdown("<div class='section-title'>Night Ratio per Profil</div>", unsafe_allow_html=True)
+        if "avg_night_ratio" in risk_df.columns:
+            nm = risk_df.groupby("profile")["avg_night_ratio"].mean().reset_index()
+            fig4 = px.bar(nm, x="profile", y="avg_night_ratio", color="avg_night_ratio", color_continuous_scale=["#6ee7b7","#fcd34d","#f87171"], text=nm["avg_night_ratio"].apply(lambda x: f"{x:.2%}"))
+            fig4.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=260, coloraxis_showscale=False)
+            st.plotly_chart(fig4, use_container_width=True)
+
+    st.divider()
+    st.markdown("<div class='section-title'>🚨 Top 10 Akun — Perubahan Pola Transaksi Terbaru</div>", unsafe_allow_html=True)
+    if "avg_temporal_shift" in risk_df.columns:
+        top10 = risk_df[risk_df["avg_temporal_shift"] > 0].sort_values("avg_temporal_shift", ascending=False).head(10).reset_index(drop=True)
+        
+        th1, th2, th3, th4, th5, th6 = st.columns([2.2, 1.3, 1.3, 1.5, 1.5, 1.5])
+        for col, label in zip([th1,th2,th3,th4,th5,th6], ["Account ID", "Level", "Risk Score", "Shift Score", "Night Ratio", "Burst Score"]):
+            with col: st.markdown(f"<div style='font-size:11px;color:#6b7280;font-weight:500;text-transform:uppercase;border-bottom:1px solid #2d3142;'>{label}</div>", unsafe_allow_html=True)
+
+        for rank, (_, row) in enumerate(top10.iterrows(), start=1):
+            c1, c2, c3, c4, c5, c6 = st.columns([2.2, 1.3, 1.3, 1.5, 1.5, 1.5])
+            with c1: st.markdown(f"<div style='padding:8px 0;'><span style='color:#4b5563;'>#{rank}</span> {row['account_id']}</div>", unsafe_allow_html=True)
+            with c2: st.markdown(f"<div style='padding:8px 0;'><span class='badge-{row['risk_level'].lower()}'>{row['risk_level']}</span></div>", unsafe_allow_html=True)
+            with c3: st.markdown(f"<div style='padding:8px 0; color:{LEVEL_COLORS[row['risk_level']]};'>{row['final_risk_score']:.1f}/100</div>", unsafe_allow_html=True)
+            with c4: st.markdown(f"<div style='padding:8px 0; color:#fb923c;'>+{row['avg_temporal_shift']:.4f}</div>", unsafe_allow_html=True)
+            with c5: st.markdown(f"<div style='padding:8px 0;'>{row['avg_night_ratio']:.1%}</div>", unsafe_allow_html=True)
+            with c6: st.markdown(f"<div style='padding:8px 0;'>{row['avg_burst_score']:.2f}x</div>", unsafe_allow_html=True)
+            st.markdown("<hr style='margin:0; border-top:0.5px solid #2d3142;'>", unsafe_allow_html=True)
+
+    st.divider()
+    st.markdown("<div class='section-title'>Azure AI Stack</div>", unsafe_allow_html=True)
+    ca2, cb2, cc2 = st.columns(3)
+    stack_data = [
+        (ca2, "☁️ Azure OpenAI (GPT-4o)", ["Synthetic data generation","Risk explanation per akun","Dynamic recommendation"]),
+        (cb2, "🤖 Azure ML Registry", ["Model: JudolGuard-Behavior v1","MLflow tracking","Workspace: ML_JudolGuard"]),
+        (cc2, "🔬 Isolation Forest Pipeline", ["Anomaly detection layer","XGBoost classifier","PR-AUC: 0.9655 | F1: 0.8598"]),
+    ]
+    for col, title, items in stack_data:
+        with col:
+            items_html = "".join([f"✓ {i}<br>" for i in items])
+            st.markdown(f"""<div class="metric-card" style="text-align:left">
+                <div style="color:#a5b4fc;font-weight:500;margin-bottom:6px">{title}</div>
+                <div style="font-size:12px;color:#6b7280;line-height:1.8">{items_html}</div>
+            </div>""", unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════
 # HALAMAN 2 — RISK TABLE (PAGINATION)
