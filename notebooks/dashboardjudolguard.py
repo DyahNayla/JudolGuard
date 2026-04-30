@@ -41,12 +41,20 @@ from plotly.subplots import make_subplots
 import time
 from openai import AzureOpenAI  # Penting untuk fitur AI rekomendasi
 
+
+
 st.set_page_config(
     page_title="JudolGuard",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+st.markdown("""
+    <head>
+        <meta name="dicoding:email" content="gevintap@gmail.com">
+    </head>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <style>
