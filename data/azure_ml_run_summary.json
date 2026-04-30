@@ -1,0 +1,12 @@
+{
+  "project": "JudolGuard",
+  "timestamp": "2026-04-30 05:14",
+  "azure_ml_workspace": "ML_JudolGuard",
+  "model_registered": "JudolGuard-Behavior-Model v1",
+  "run_id": "881dd24e3a0745b4b172b88f645ef6ba",
+  "metrics": {
+    "pr_auc": 0.9655,
+    "f1_score": 0.8598,
+    "roc_auc": 0.7381
+  }
+}
