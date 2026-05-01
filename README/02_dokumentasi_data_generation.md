@@ -176,7 +176,7 @@ mencerminkan karakteristik judol yang didokumentasikan PPATK.
 |---|---|
 | `data/seed_accounts.csv` | 20 akun mentah hasil Azure OpenAI, 798 transaksi |
 | `data/judolguard_.csv` | Dataset final: 200 akun, ±8.000–12.000 baris, 22 fitur |
-| `data/behavioral_shift_evidence.png` | 6 chart bukti behavioral shift antar profil |
+| `data/eda_behavioral_shift.png` | 6 chart bukti behavioral shift antar profil |
 
 ---
 2. **XGBoost Classifier** — supervised classification dengan `is_at_risk` sebagai target
