@@ -1,16 +1,16 @@
-# 📊 Notebook 02 — Synthetic Data Generation & Feature Engineering
+# Synthetic Data Generation & Feature Engineering
 ## JudolGuard: Early Behavioral Shift Detection System
 
 ---
 
-## 🔍 Mengapa Kami Membuat Data Sendiri?
+## Mengapa Kami Membuat Data Sendiri?
 
 Tidak ada dataset transaksi judi online yang tersedia secara publik di Indonesia.
 Data transaksi nasabah bersifat **sangat tertutup** — bank dan e-wallet tidak mempublikasikannya
 karena alasan privasi dan regulasi OJK.
 
 Dataset umum seperti **PaySim** (simulasi fraud mobile money) tidak bisa digunakan langsung
-karena dirancang untuk fraud model "hit-and-run" — satu transaksi besar langsung fraud.
+karena dirancang untuk fraud model "hit-and-run" = satu transaksi besar langsung fraud.
 Setelah divalidasi melalui EDA, ditemukan bahwa **>90% akun fraud di PaySim adalah burner accounts**
 tanpa riwayat perilaku sebelumnya, sehingga tidak bisa mencerminkan behavioral shift bertahap
 yang menjadi inti dari solusi JudolGuard.
@@ -32,7 +32,7 @@ berbasis bukti yang terdokumentasi.
 
 ---
 
-## 🏗️ Arsitektur Data: 4 Profil Perilaku
+## Arsitektur Data: 4 Profil Perilaku
 
 Berbeda dari dataset fraud konvensional yang hanya punya label biner (fraud/tidak),
 JudolGuard merancang **4 profil perilaku** yang merepresentasikan spektrum keterlibatan judol:
@@ -59,7 +59,7 @@ is_at_risk=0    is_at_risk=0       is_at_risk=1         is_at_risk=1
 - Amount judol masih kecil Rp50.000–150.000
 - **Sinyal lemah, belum cukup untuk flag**
 
-### Profil 3: Escalating ⚠️ *(TARGET UTAMA DETEKSI)*
+### Profil 3: Escalating *(TARGET UTAMA DETEKSI)*
 - **Minggu 1–2:** Normal (3–4 tx/hari, siang hari)
 - **Minggu 3–4:** Mulai shift (5–8 tx/hari, mulai aktif malam)
 - **Minggu 5–6:** Eskalasi penuh (10–15 tx/hari, dominan jam 22.00–04.00, smurfing)
@@ -74,7 +74,7 @@ is_at_risk=0    is_at_risk=0       is_at_risk=1         is_at_risk=1
 
 ---
 
-## ⚙️ Strategi Generasi: Seed + Augmentasi
+## Strategi Generasi: Seed + Augmentasi
 
 Karena data transaksi real tidak tersedia dan pemanggilan Azure OpenAI memiliki
 batas token, kami menggunakan pendekatan dua tahap:
@@ -100,7 +100,7 @@ batas token, kami menggunakan pendekatan dua tahap:
 
 ---
 
-## 🔧 Feature Engineering: 3 Dimensi Behavioral
+## Feature Engineering: 3 Dimensi Behavioral
 
 Semua fitur dirancang berbasis **tiga dimensi perilaku** yang secara langsung
 mencerminkan karakteristik judol yang didokumentasikan PPATK.
@@ -152,7 +152,7 @@ mencerminkan karakteristik judol yang didokumentasikan PPATK.
 
 ---
 
-## 🎯 Label Target: `is_at_risk`
+## Label Target: `is_at_risk`
 
 | Profil | Label | Logika |
 |---|---|---|
@@ -170,19 +170,14 @@ mencerminkan karakteristik judol yang didokumentasikan PPATK.
 
 ---
 
-## 📁 Output Fase Ini
+## Output Fase Ini
 
 | File | Isi |
 |---|---|
 | `data/seed_accounts.csv` | 20 akun mentah hasil Azure OpenAI, 798 transaksi |
-| `data/judolguard_features.csv` | Dataset final: 200 akun, ±8.000–12.000 baris, 22 fitur |
+| `data/judolguard_.csv` | Dataset final: 200 akun, ±8.000–12.000 baris, 22 fitur |
 | `data/behavioral_shift_evidence.png` | 6 chart bukti behavioral shift antar profil |
 
 ---
-
-## ➡️ Next Step: Notebook 03 — Modeling
-
-Dataset `judolguard_features.csv` siap masuk ke pipeline modeling:
-1. **Isolation Forest** — deteksi anomali unsupervised (tidak butuh label)
 2. **XGBoost Classifier** — supervised classification dengan `is_at_risk` sebagai target
 3. Evaluasi dengan **PR-AUC dan F1-Score** (bukan accuracy — data imbalanced)
